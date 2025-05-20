@@ -6,6 +6,7 @@ RUN sudo apt-get update && sudo apt-get install -y openjdk-11-jdk unzip wget
 
 # Android SDK Pfad definieren
 ENV ANDROID_SDK_ROOT=/usr/lib/android-sdk
+ENV ANDROID_HOME=/usr/lib/android-sdk
 ENV PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/tools
 
 # Android SDK Commandline Tools installieren
