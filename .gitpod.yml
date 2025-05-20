@@ -2,5 +2,14 @@ image:
   file: .gitpod.Dockerfile
 
 tasks:
-  - init: flutter doctor
-    command: bash
+  - init: |
+      flutter config --android-sdk /usr/lib/android-sdk
+      flutter doctor
+      flutter channel stable
+      flutter upgrade
+      flutter config --enable-web
+    command: flutter run -d web-server --web-port=8080 --web-hostname=0.0.0.0
+
+ports:
+  - port: 8080
+    onOpen: open-preview
