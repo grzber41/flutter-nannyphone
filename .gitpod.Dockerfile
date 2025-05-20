@@ -1,35 +1,27 @@
-# Basis-Image mit Ubuntu
+# Verwende das offizielle Gitpod Flutter-Image als Basis
 FROM gitpod/workspace-full:latest
 
-# Flutter Version und Android SDK Installieren
-ENV FLUTTER_VERSION=3.29.3
+# Java 11 installieren (für Android SDK und Flutter)
+RUN sudo apt-get update && sudo apt-get install -y openjdk-11-jdk unzip wget
+
+# Android SDK Pfad definieren
 ENV ANDROID_SDK_ROOT=/usr/lib/android-sdk
+ENV PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/tools
 
-# Flutter SDK herunterladen
-RUN git clone https://github.com/flutter/flutter.git -b stable /home/gitpod/flutter
+# Android SDK Commandline Tools installieren
+RUN mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
 
-# Flutter in PATH einfügen
-ENV PATH="/home/gitpod/flutter/bin:/home/gitpod/flutter/bin/cache/dart-sdk/bin:${PATH}"
+RUN wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O /tmp/cmdline-tools.zip && \
+    unzip /tmp/cmdline-tools.zip -d $ANDROID_SDK_ROOT/cmdline-tools && \
+    mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest && \
+    rm /tmp/cmdline-tools.zip
 
-# Android SDK Tools installieren
-RUN sudo apt-get update && sudo apt-get install -y \
-    unzip openjdk-11-jdk \
-    libglu1-mesa && \
-    sudo mkdir -p ${ANDROID_SDK_ROOT} && \
-    cd /tmp && \
-    curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip && \
-    unzip sdk-tools.zip -d ${ANDROID_SDK_ROOT} && \
-    rm sdk-tools.zip
+# Akzeptiere Lizenzen automatisch
+RUN yes | sdkmanager --sdk_root=${ANDROID_SDK_ROOT} --licenses
 
-# Android SDK initialisieren
-RUN yes | ${ANDROID_SDK_ROOT}/cmdline-tools/bin/sdkmanager --sdk_root=${ANDROID_SDK_ROOT} --licenses
-RUN ${ANDROID_SDK_ROOT}/cmdline-tools/bin/sdkmanager --sdk_root=${ANDROID_SDK_ROOT} "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+# Installiere Plattform-Tools, Build-Tools und Android Plattform
+RUN sdkmanager --sdk_root=${ANDROID_SDK_ROOT} "platform-tools" "platforms;android-33" "build-tools;33.0.0"
 
-# Android SDK in PATH
-ENV PATH="${PATH}:${ANDROID_SDK_ROOT}/platform-tools"
+# Flutter Upgrade und Konfiguration (optional hier, kann auch im .gitpod.yml gemacht werden)
+RUN flutter channel stable && flutter upgrade
 
-# Flutter-Abhängigkeiten laden (erste Ausführung)
-RUN flutter doctor
-
-# Arbeitsverzeichnis setzen
-WORKDIR /workspace
