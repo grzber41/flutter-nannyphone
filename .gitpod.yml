@@ -1,12 +1,18 @@
 image:
-  file: .gitpod.Dockerfile
+  file: Dockerfile
 
 tasks:
-  - init: |
-      flutter doctor
+  - name: Flutter vorbereiten
+    init: |
       flutter pub get
-    command: flutter run -d web-server --web-port=8080 --web-hostname=0.0.0.0
+    command: |
+      echo "Flutter-Umgebung bereit!"
 
 ports:
-  - port: 8080
+  - port: 3000
     onOpen: open-preview
+    description: Flutter Web Preview
+
+vscode:
+  extensions:
+    - Dart-Code.flutter
